@@ -1,0 +1,18 @@
+PARTE 2: IMÁGENES Y FONDO
+
+Solicitud:
+DAME EL PASO A PASO PARA HACER ESTO
+Se adjuntó Taller1_Parte3_KD(1).pdf, que solicita imágenes
+y un fondo para el proyecto.
+
+Resultado propuesto:
+Agregar una imagen de gato mediante HTML.
+Agregar un fondo de página mediante CSS.
+Conservar completamente el JavaScript.
+
+Archivos utilizados:
+imagenes/fondo.jpg
+imagenes/gato.png
+
+Origen de las imágenes:
+Anotar aquí las direcciones reales de donde se obtuvieron.
