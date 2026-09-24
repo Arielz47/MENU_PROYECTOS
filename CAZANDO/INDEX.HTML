@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Juego Cazando</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #201331;
+      color: white;
+    }
+
+    main { max-width: 650px; margin: auto; }
+
+    .volver {
+      display: inline-block;
+      padding: 10px 18px;
+      border-radius: 10px;
+      background: #41295d;
+      color: white;
+      text-decoration: none;
+    }
+
+    h1 { margin-bottom: 8px; }
+
+    .instrucciones { color: #e1d4ee; line-height: 1.5; }
+
+    .marcador {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .marcador span {
+      padding: 12px 18px;
+      border-radius: 10px;
+      background: #41295d;
+      font-weight: bold;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      max-width: 600px;
+      height: auto;
+      margin: auto;
+      background: #f6f0ff;
+      border: 4px solid #b68aff;
+      border-radius: 15px;
+    }
+
+    #mensaje { min-height: 28px; font-weight: bold; }
+
+    button {
+      padding: 13px 22px;
+      margin: 5px;
+      border: 0;
+      border-radius: 10px;
+      background: #b68aff;
+      color: #201331;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      touch-action: none;
+    }
+
+    button:disabled { opacity: .55; cursor: default; }
+
+    .controles {
+      display: grid;
+      grid-template-columns: repeat(3, 65px);
+      justify-content: center;
+      margin-top: 15px;
+    }
+
+    .direccion {
+      padding: 10px;
+      font-size: 24px;
+      background: #ede1ff;
+      user-select: none;
+    }
+
+    .arriba { grid-column: 2; }
+    .izquierda { grid-column: 1; grid-row: 2; }
+    .abajo { grid-column: 2; grid-row: 2; }
+    .derecha { grid-column: 3; grid-row: 2; }
+
+    :focus-visible { outline: 3px solid #ffcd32; outline-offset: 3px; }
+  </style>
+</head>
+
+<body>
+  <main>
+    <a class="volver" href="../index.html">← Volver al menú</a>
+
+    <h1>🐱 Juego Cazando</h1>
+    <p class="instrucciones">
+      Recoge 5 comidas en 30 segundos.
+      Usa las flechas del teclado o los botones de movimiento.
+    </p>
+
+    <div class="marcador">
+      <span>Comidas: <b id="puntos">0</b> / 5</span>
+      <span>Tiempo: <b id="tiempo">30</b> s</span>
+    </div>
+
+    <canvas
+      id="canvas"
+      width="600"
+      height="400"
+      aria-label="Área del juego Cazando"
+    >
+      Tu navegador necesita admitir canvas para mostrar el juego.
+    </canvas>
+
+    <p id="mensaje" role="status">Presiona Iniciar para jugar.</p>
+
+    <div>
+      <button id="iniciar">Iniciar</button>
+      <button id="reiniciar">Reiniciar</button>
+    </div>
+
+    <div class="controles" aria-label="Controles de movimiento">
+      <button class="direccion arriba" data-key="ArrowUp" aria-label="Subir">↑</button>
+      <button class="direccion izquierda" data-key="ArrowLeft" aria-label="Izquierda">←</button>
+      <button class="direccion abajo" data-key="ArrowDown" aria-label="Bajar">↓</button>
+      <button class="direccion derecha" data-key="ArrowRight" aria-label="Derecha">→</button>
+    </div>
+  </main>
+
+  <script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const puntosTexto = document.getElementById("puntos");
+    const tiempoTexto = document.getElementById("tiempo");
+    const mensaje = document.getElementById("mensaje");
+    const iniciarBoton = document.getElementById("iniciar");
+
+    const teclado = new Set();
+    const tactil = new Map();
+    const flechas = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
+
+    const gato = { x: 280, y: 180, ancho: 40, alto: 40 };
+    const comida = { x: 100, y: 100, ancho: 26, alto: 26 };
+
+    let puntos = 0;
+    let jugando = false;
+    let animacion = 0;
+    let anterior = 0;
+    let finalizaEn = 0;
+
+    function nuevaComida() {
+      // Ubica la comida lejos de la posición actual del gato.
+      do {
+        comida.x = 15 + Math.random() * (canvas.width - comida.ancho - 30);
+        comida.y = 15 + Math.random() * (canvas.height - comida.alto - 30);
+      } while (
+        Math.hypot(comida.x - gato.x, comida.y - gato.y) < 100
+      );
+    }
+
+    function dibujar() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#f6f0ff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.strokeStyle = "#e8ddf4";
+      ctx.lineWidth = 1;
+
+      for (let x = 0; x <= canvas.width; x += 40) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
+
+      for (let y = 0; y <= canvas.height; y += 40) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+
+      // Comida.
+      ctx.fillStyle = "#dc4c67";
+      ctx.beginPath();
+      ctx.arc(
+        comida.x + comida.ancho / 2,
+        comida.y + comida.alto / 2,
+        comida.ancho / 2,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+
+      // Cara del gato.
+      ctx.fillStyle = "#ed9e38";
+      ctx.fillRect(gato.x, gato.y + 10, gato.ancho, 30);
+
+      // Orejas.
+      ctx.beginPath();
+      ctx.moveTo(gato.x, gato.y + 12);
+      ctx.lineTo(gato.x + 3, gato.y);
+      ctx.lineTo(gato.x + 15, gato.y + 12);
+      ctx.moveTo(gato.x + 25, gato.y + 12);
+      ctx.lineTo(gato.x + 37, gato.y);
+      ctx.lineTo(gato.x + 40, gato.y + 12);
+      ctx.fill();
+
+      // Ojos.
+      ctx.fillStyle = "#172033";
+      ctx.fillRect(gato.x + 9, gato.y + 20, 5, 6);
+      ctx.fillRect(gato.x + 26, gato.y + 20, 5, 6);
+
+      // Nariz.
+      ctx.fillStyle = "#a9445b";
+      ctx.fillRect(gato.x + 18, gato.y + 29, 5, 4);
+    }
+
+    function presionada(tecla) {
+      return teclado.has(tecla) ||
+        [...tactil.values()].includes(tecla);
+    }
+
+    function terminar(texto) {
+      jugando = false;
+      teclado.clear();
+      tactil.clear();
+      iniciarBoton.disabled = false;
+      mensaje.textContent = texto;
+    }
+
+    function actualizar(segundos) {
+      let dx =
+        Number(presionada("ArrowRight")) -
+        Number(presionada("ArrowLeft"));
+
+      let dy =
+        Number(presionada("ArrowDown")) -
+        Number(presionada("ArrowUp"));
+
+      // Mantiene la misma velocidad al desplazarse en diagonal.
+      const distancia = Math.hypot(dx, dy);
+
+      if (distancia > 0) {
+        dx /= distancia;
+        dy /= distancia;
+      }
+
+      gato.x += dx * 240 * segundos;
+      gato.y += dy * 240 * segundos;
+
+      gato.x = Math.max(0, Math.min(canvas.width - gato.ancho, gato.x));
+      gato.y = Math.max(0, Math.min(canvas.height - gato.alto, gato.y));
+
+      const tocaComida =
+        gato.x < comida.x + comida.ancho &&
+        gato.x + gato.ancho > comida.x &&
+        gato.y < comida.y + comida.alto &&
+        gato.y + gato.alto > comida.y;
+
+      if (tocaComida) {
+        puntos++;
+        puntosTexto.textContent = puntos;
+
+        if (puntos >= 5) {
+          terminar("¡Ganaste! El gato recogió las 5 comidas. 🎉");
+        } else {
+          nuevaComida();
+        }
+      }
+    }
+
+    function bucle(ahora) {
+      if (!jugando) return;
+
+      const restante = Math.max(0, (finalizaEn - ahora) / 1000);
+      tiempoTexto.textContent = Math.ceil(restante);
+
+      if (restante <= 0) {
+        terminar("Se acabó el tiempo. Presiona Reiniciar para volver a jugar.");
+        dibujar();
+        return;
+      }
+
+      const segundos = anterior
+        ? Math.min((ahora - anterior) / 1000, 0.04)
+        : 0;
+
+      anterior = ahora;
+      actualizar(segundos);
+      dibujar();
+
+      if (jugando) animacion = requestAnimationFrame(bucle);
+    }
+
+    function comenzar() {
+      cancelAnimationFrame(animacion);
+      puntos = 0;
+      gato.x = 280;
+      gato.y = 180;
+      anterior = 0;
+      teclado.clear();
+      tactil.clear();
+
+      puntosTexto.textContent = "0";
+      tiempoTexto.textContent = "30";
+      nuevaComida();
+
+      jugando = true;
+      iniciarBoton.disabled = true;
+      finalizaEn = performance.now() + 30000;
+      mensaje.textContent = "¡Busca la comida!";
+      dibujar();
+      animacion = requestAnimationFrame(bucle);
+    }
+
+    document.getElementById("iniciar").addEventListener("click", comenzar);
+    document.getElementById("reiniciar").addEventListener("click", comenzar);
+
+    window.addEventListener("keydown", function (evento) {
+      if (!flechas.includes(evento.key) || !jugando) return;
+      evento.preventDefault();
+      teclado.add(evento.key);
+    });
+
+    window.addEventListener("keyup", function (evento) {
+      teclado.delete(evento.key);
+    });
+
+    document.querySelectorAll("[data-key]").forEach(function (boton) {
+      boton.addEventListener("pointerdown", function (evento) {
+        if (!jugando) return;
+        evento.preventDefault();
+        boton.setPointerCapture(evento.pointerId);
+        tactil.set(evento.pointerId, boton.dataset.key);
+      });
+
+      ["pointerup", "pointercancel", "lostpointercapture"].forEach(function (tipo) {
+        boton.addEventListener(tipo, function (evento) {
+          tactil.delete(evento.pointerId);
+        });
+      });
+    });
+
+    window.addEventListener("blur", function () {
+      teclado.clear();
+      tactil.clear();
+      anterior = 0;
+    });
+
+    document.addEventListener("visibilitychange", function () {
+      teclado.clear();
+      tactil.clear();
+      anterior = 0;
+    });
+
+    dibujar();
+  </script>
+</body>
+</html>

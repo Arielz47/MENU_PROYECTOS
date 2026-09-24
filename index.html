@@ -1,73 +1,152 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Proyectos</title>
-    <link rel="stylesheet" href="estilos.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mis proyectos | Andres Zhispon</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #eef2ff;
+      color: #172033;
+      line-height: 1.6;
+    }
+
+    header {
+      padding: 55px 20px;
+      text-align: center;
+      background: linear-gradient(120deg, #101827, #254edb);
+      color: white;
+    }
+
+    header h1 {
+      margin: 0 0 12px;
+      font-size: clamp(30px, 6vw, 48px);
+    }
+
+    header p { margin: 5px; }
+
+    main {
+      width: min(960px, 92%);
+      margin: 40px auto;
+    }
+
+    .bienvenida {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .proyectos {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 25px;
+    }
+
+    .tarjeta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 32px;
+      border-radius: 20px;
+      border-top: 6px solid #eab308;
+      background: white;
+      box-shadow: 0 12px 30px #17203315;
+    }
+
+    .cazando { border-top-color: #7c3aed; }
+
+    .icono { font-size: 55px; }
+
+    .tarjeta h2 {
+      margin: 12px 0;
+      font-size: 27px;
+    }
+
+    .tarjeta p { color: #526078; }
+
+    .etiqueta {
+      margin-bottom: 25px;
+      font-size: 14px;
+      color: #526078;
+    }
+
+    .boton {
+      margin-top: auto;
+      padding: 13px 24px;
+      border-radius: 10px;
+      background: #254edb;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .boton:hover { background: #1837a8; }
+    .cazando .boton { background: #7430cf; }
+    .cazando .boton:hover { background: #54209c; }
+
+    a:focus-visible {
+      outline: 3px solid #111827;
+      outline-offset: 5px;
+    }
+
+    footer {
+      padding: 25px;
+      text-align: center;
+      color: #526078;
+    }
+
+    @media (max-width: 650px) {
+      .proyectos { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 
 <body>
+  <header>
+    <h1>Mis proyectos web</h1>
+    <p>Andres Zhispon · Arielz47</p>
+    <p>Curso: Programación</p>
+  </header>
 
-    <header>
-        <h1>Mis Proyectos</h1>
-        <p>Portafolio de proyectos desarrollados durante el curso</p>
-    </header>
+  <main>
+    <section class="bienvenida">
+      <h2>¡Elige tu próximo desafío!</h2>
+      <p>Proyectos desarrollados con HTML, CSS y JavaScript.</p>
+    </section>
 
-    <main>
+    <section class="proyectos" aria-label="Juegos disponibles">
+      <article class="tarjeta">
+        <span class="icono" aria-hidden="true">🍋</span>
+        <h2>Juego de Limones</h2>
+        <p>
+          Atrapa 10 limones para ganar. Tienes 3 vidas y la
+          dificultad aumenta mientras sumas puntos.
+        </p>
+        <span class="etiqueta">Flechas del teclado · Controles táctiles</span>
+        <a class="boton" href="./limones/index.html">
+          Jugar Limones →
+        </a>
+      </article>
 
-        <section class="presentacion">
-            <h2>¡Bienvenido!</h2>
+      <article class="tarjeta cazando">
+        <span class="icono" aria-hidden="true">🐱</span>
+        <h2>Juego Cazando</h2>
+        <p>
+          Ayuda al gato a recoger 5 comidas antes de que
+          terminen los 30 segundos.
+        </p>
+        <span class="etiqueta">Flechas del teclado · Controles táctiles</span>
+        <a class="boton" href="./cazando/index.html">
+          Jugar Cazando →
+        </a>
+      </article>
+    </section>
+  </main>
 
-            <p>
-                Autor: Andres Zhispon
-            </p>
-
-            <p>
-                Curso: Programación
-            </p>
-
-            <p>
-                En este menú encontrarás los diferentes proyectos
-                desarrollados durante el curso.
-            </p>
-        </section>
-
-        <section class="proyectos">
-
-            <div class="tarjeta">
-                <h2>🍋 Juego de Limones</h2>
-
-                <p>
-                    Juego desarrollado con HTML, CSS y JavaScript
-                    en el que debes atrapar los limones.
-                </p>
-
-                <a href="https://mi-juego-limones.vercel.app" target="_blank">
-    Abrir Juego
-</a>
-            </div>
-
-            <div class="tarjeta">
-                <h2>🎯 Juego Cazando</h2>
-
-                <p>
-                    Proyecto interactivo desarrollado utilizando
-                    HTML, CSS y JavaScript.
-                </p>
-
-                <a href="https://mi-juego-cazando.vercel.app" target="_blank">
-    Abrir Juego
-</a>
-            </div>
-
-        </section>
-
-    </main>
-
-    <footer>
-        <p>© 2026 - Andres Zhispon</p>
-    </footer>
-
+  <footer>Desarrollado por Andres Zhispon · Arielz47</footer>
 </body>
 </html>

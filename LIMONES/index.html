@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Juego de Limones</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #102134;
+      color: white;
+    }
+
+    main { max-width: 650px; margin: auto; }
+
+    .volver {
+      display: inline-block;
+      padding: 10px 18px;
+      border-radius: 10px;
+      background: #253f5c;
+      color: white;
+      text-decoration: none;
+    }
+
+    h1 { margin-bottom: 8px; }
+
+    .instrucciones { color: #d0deec; line-height: 1.5; }
+
+    .marcador {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .marcador span {
+      padding: 12px 18px;
+      border-radius: 10px;
+      background: #253f5c;
+      font-weight: bold;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      max-width: 600px;
+      height: auto;
+      margin: auto;
+      background: #eaf7ff;
+      border: 4px solid #ffcd32;
+      border-radius: 15px;
+    }
+
+    #mensaje { min-height: 28px; font-weight: bold; }
+
+    button {
+      padding: 13px 22px;
+      margin: 6px;
+      border: 0;
+      border-radius: 10px;
+      background: #ffcd32;
+      color: #172033;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      touch-action: none;
+    }
+
+    button:disabled { opacity: .55; cursor: default; }
+
+    .direccion {
+      min-width: 95px;
+      background: #dbeafe;
+      font-size: 24px;
+      user-select: none;
+    }
+
+    :focus-visible { outline: 3px solid #75caff; outline-offset: 3px; }
+  </style>
+</head>
+
+<body>
+  <main>
+    <a class="volver" href="../index.html">← Volver al menú</a>
+
+    <h1>🍋 Juego de Limones</h1>
+    <p class="instrucciones">
+      Atrapa 10 limones. Usa ← → o mantén presionados los botones.
+      Al perder 3 limones termina la partida.
+    </p>
+
+    <div class="marcador">
+      <span>Puntos: <b id="puntos">0</b> / 10</span>
+      <span>Vidas: <b id="vidas">3</b></span>
+    </div>
+
+    <canvas
+      id="canvas"
+      width="600"
+      height="460"
+      aria-label="Área del juego de Limones"
+    >
+      Tu navegador necesita admitir canvas para mostrar el juego.
+    </canvas>
+
+    <p id="mensaje" role="status">Presiona Iniciar para jugar.</p>
+
+    <div>
+      <button id="iniciar">Iniciar</button>
+      <button id="reiniciar">Reiniciar</button>
+    </div>
+
+    <div aria-label="Controles de movimiento">
+      <button class="direccion" data-key="ArrowLeft" aria-label="Mover izquierda">←</button>
+      <button class="direccion" data-key="ArrowRight" aria-label="Mover derecha">→</button>
+    </div>
+  </main>
+
+  <script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const puntosTexto = document.getElementById("puntos");
+    const vidasTexto = document.getElementById("vidas");
+    const mensaje = document.getElementById("mensaje");
+    const iniciarBoton = document.getElementById("iniciar");
+
+    const teclado = new Set();
+    const tactil = new Map();
+
+    const cesta = { x: 250, y: 405, ancho: 100, alto: 25 };
+    const limon = { x: 300, y: -20, radio: 14 };
+
+    let puntos = 0;
+    let vidas = 3;
+    let jugando = false;
+    let animacion = 0;
+    let anterior = 0;
+
+    function actualizarMarcador() {
+      puntosTexto.textContent = puntos;
+      vidasTexto.textContent = vidas;
+    }
+
+    function nuevoLimon() {
+      limon.x = limon.radio +
+        Math.random() * (canvas.width - limon.radio * 2);
+      limon.y = -20;
+    }
+
+    function dibujar() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#eaf7ff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#cce9d6";
+      ctx.fillRect(0, 437, canvas.width, 23);
+
+      // Cesta.
+      ctx.fillStyle = "#a45b25";
+      ctx.fillRect(cesta.x, cesta.y, cesta.ancho, cesta.alto);
+      ctx.fillStyle = "#e39440";
+      ctx.fillRect(cesta.x - 4, cesta.y, cesta.ancho + 8, 7);
+
+      // Limón.
+      ctx.beginPath();
+      ctx.ellipse(limon.x, limon.y, 17, 13, -.4, 0, Math.PI * 2);
+      ctx.fillStyle = "#facc15";
+      ctx.fill();
+      ctx.strokeStyle = "#b88900";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.ellipse(limon.x + 8, limon.y - 13, 8, 4, -.5, 0, Math.PI * 2);
+      ctx.fillStyle = "#26934d";
+      ctx.fill();
+    }
+
+    function presionada(tecla) {
+      return teclado.has(tecla) ||
+        [...tactil.values()].includes(tecla);
+    }
+
+    function terminar(texto) {
+      jugando = false;
+      teclado.clear();
+      tactil.clear();
+      iniciarBoton.disabled = false;
+      mensaje.textContent = texto;
+    }
+
+    function actualizar(segundos) {
+      const direccion =
+        Number(presionada("ArrowRight")) -
+        Number(presionada("ArrowLeft"));
+
+      cesta.x += direccion * 380 * segundos;
+      cesta.x = Math.max(
+        0,
+        Math.min(canvas.width - cesta.ancho, cesta.x)
+      );
+
+      const velocidad = puntos >= 6 ? 290 : puntos >= 3 ? 225 : 170;
+      const fondoAnterior = limon.y + limon.radio;
+      limon.y += velocidad * segundos;
+
+      const cruzaCesta =
+        fondoAnterior <= cesta.y &&
+        limon.y + limon.radio >= cesta.y;
+
+      const coincideHorizontal =
+        limon.x + limon.radio >= cesta.x &&
+        limon.x - limon.radio <= cesta.x + cesta.ancho;
+
+      if (cruzaCesta && coincideHorizontal) {
+        puntos++;
+        actualizarMarcador();
+
+        if (puntos >= 10) {
+          terminar("¡Ganaste! Atrapaste los 10 limones. 🎉");
+        } else {
+          nuevoLimon();
+        }
+      } else if (limon.y - limon.radio > canvas.height) {
+        vidas--;
+        actualizarMarcador();
+
+        if (vidas <= 0) {
+          terminar("GAME OVER. Presiona Reiniciar para intentarlo otra vez.");
+        } else {
+          nuevoLimon();
+        }
+      }
+    }
+
+    function bucle(tiempo) {
+      if (!jugando) return;
+
+      const segundos = anterior
+        ? Math.min((tiempo - anterior) / 1000, 0.04)
+        : 0;
+
+      anterior = tiempo;
+      actualizar(segundos);
+      dibujar();
+
+      if (jugando) animacion = requestAnimationFrame(bucle);
+    }
+
+    function comenzar() {
+      cancelAnimationFrame(animacion);
+      puntos = 0;
+      vidas = 3;
+      cesta.x = 250;
+      anterior = 0;
+      teclado.clear();
+      tactil.clear();
+      nuevoLimon();
+      actualizarMarcador();
+
+      jugando = true;
+      iniciarBoton.disabled = true;
+      mensaje.textContent = "¡Atrapa los limones!";
+      dibujar();
+      animacion = requestAnimationFrame(bucle);
+    }
+
+    document.getElementById("iniciar").addEventListener("click", comenzar);
+    document.getElementById("reiniciar").addEventListener("click", comenzar);
+
+    window.addEventListener("keydown", function (evento) {
+      if (!["ArrowLeft", "ArrowRight"].includes(evento.key)) return;
+      if (!jugando) return;
+      evento.preventDefault();
+      teclado.add(evento.key);
+    });
+
+    window.addEventListener("keyup", function (evento) {
+      teclado.delete(evento.key);
+    });
+
+    document.querySelectorAll("[data-key]").forEach(function (boton) {
+      boton.addEventListener("pointerdown", function (evento) {
+        if (!jugando) return;
+        evento.preventDefault();
+        boton.setPointerCapture(evento.pointerId);
+        tactil.set(evento.pointerId, boton.dataset.key);
+      });
+
+      ["pointerup", "pointercancel", "lostpointercapture"].forEach(function (tipo) {
+        boton.addEventListener(tipo, function (evento) {
+          tactil.delete(evento.pointerId);
+        });
+      });
+    });
+
+    window.addEventListener("blur", function () {
+      teclado.clear();
+      tactil.clear();
+      anterior = 0;
+    });
+
+    document.addEventListener("visibilitychange", function () {
+      anterior = 0;
+      teclado.clear();
+      tactil.clear();
+    });
+
+    dibujar();
+  </script>
+</body>
+</html>

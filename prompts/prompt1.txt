@@ -1,0 +1,48 @@
+PROMPT 1
+
+Rol:
+Actúa como un desarrollador web especializado en HTML, CSS y JavaScript.
+
+Solicitud:
+Necesito crear una interfaz visual para un menú principal de mis
+proyectos de programación.
+
+El menú debe contener:
+
+- Nombre del autor.
+- Nombre del curso.
+- Una breve descripción.
+- Un apartado para el Juego de Limones.
+- Un apartado para el Juego Cazando.
+- Un botón para abrir cada proyecto publicado en Vercel.
+- Diseño moderno y atractivo.
+- Diseño adaptable a computadoras y dispositivos móviles.
+
+Este menú servirá para agregar todos los proyectos que desarrolle
+durante el curso.
+CONTINUACIÓN DEL TRABAJO: MENÚ UNIFICADO
+
+SOLICITUD DEL USUARIO:
+LOS JUEGOS AUN NO LOS TENGO EN VERCEL QUIERO SUBIRLOS
+JUNTO CON ESTE TRABAJO UNA SOLA UNIFICADO
+
+SIGUIENTE SOLICITUD DEL USUARIO:
+DAME TODO LISTO SOLO PARA AGREGAR LOS CODIGOS
+
+RESULTADO DE ESTA ITERACIÓN:
+Se proporcionó un menú principal con enlaces relativos a dos carpetas:
+limones y cazando.
+
+Cada carpeta contiene un index.html independiente con:
+- Estilos CSS incluidos.
+- Lógica JavaScript incluida.
+- Controles de teclado y botones táctiles.
+- Inicio y reinicio de la partida.
+- Botón para regresar al menú.
+
+Limones: 3 vidas, victoria con 10 puntos y aumento de velocidad.
+Cazando: recoger 5 comidas en 30 segundos.
+
+Autor mostrado: Andres Zhispon.
+Nickname: Arielz47.
+Curso: Programación.
