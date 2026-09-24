@@ -3,10 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Mis proyectos | Andres Zhispon</title>
+  <title>Mis proyectos | Arielz47</title>
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -28,7 +30,9 @@
       font-size: clamp(30px, 6vw, 48px);
     }
 
-    header p { margin: 5px; }
+    header p {
+      margin: 5px;
+    }
 
     main {
       width: min(960px, 92%);
@@ -57,16 +61,22 @@
       box-shadow: 0 12px 30px #17203315;
     }
 
-    .cazando { border-top-color: #7c3aed; }
+    .cazando {
+      border-top-color: #7c3aed;
+    }
 
-    .icono { font-size: 55px; }
+    .icono {
+      font-size: 55px;
+    }
 
     .tarjeta h2 {
       margin: 12px 0;
       font-size: 27px;
     }
 
-    .tarjeta p { color: #526078; }
+    .tarjeta p {
+      color: #526078;
+    }
 
     .etiqueta {
       margin-bottom: 25px;
@@ -84,9 +94,17 @@
       font-weight: bold;
     }
 
-    .boton:hover { background: #1837a8; }
-    .cazando .boton { background: #7430cf; }
-    .cazando .boton:hover { background: #54209c; }
+    .boton:hover {
+      background: #1837a8;
+    }
+
+    .cazando .boton {
+      background: #7430cf;
+    }
+
+    .cazando .boton:hover {
+      background: #54209c;
+    }
 
     a:focus-visible {
       outline: 3px solid #111827;
@@ -100,7 +118,9 @@
     }
 
     @media (max-width: 650px) {
-      .proyectos { grid-template-columns: 1fr; }
+      .proyectos {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -108,25 +128,33 @@
 <body>
   <header>
     <h1>Mis proyectos web</h1>
-    <p>Andres Zhispon · Arielz47</p>
+    <p>Autor: Arielz47</p>
     <p>Curso: Programación</p>
   </header>
 
   <main>
     <section class="bienvenida">
       <h2>¡Elige tu próximo desafío!</h2>
-      <p>Proyectos desarrollados con HTML, CSS y JavaScript.</p>
+      <p>
+        Proyectos desarrollados con HTML, CSS y JavaScript.
+      </p>
     </section>
 
     <section class="proyectos" aria-label="Juegos disponibles">
       <article class="tarjeta">
         <span class="icono" aria-hidden="true">🍋</span>
+
         <h2>Juego de Limones</h2>
+
         <p>
           Atrapa 10 limones para ganar. Tienes 3 vidas y la
           dificultad aumenta mientras sumas puntos.
         </p>
-        <span class="etiqueta">Flechas del teclado · Controles táctiles</span>
+
+        <span class="etiqueta">
+          Flechas del teclado · Controles táctiles
+        </span>
+
         <a class="boton" href="./limones/index.html">
           Jugar Limones →
         </a>
@@ -134,12 +162,18 @@
 
       <article class="tarjeta cazando">
         <span class="icono" aria-hidden="true">🐱</span>
+
         <h2>Juego Cazando</h2>
+
         <p>
           Ayuda al gato a recoger 5 comidas antes de que
           terminen los 30 segundos.
         </p>
-        <span class="etiqueta">Flechas del teclado · Controles táctiles</span>
+
+        <span class="etiqueta">
+          Flechas del teclado · Controles táctiles
+        </span>
+
         <a class="boton" href="./cazando/index.html">
           Jugar Cazando →
         </a>
@@ -147,6 +181,8 @@
     </section>
   </main>
 
-  <footer>Desarrollado por Andres Zhispon · Arielz47</footer>
+  <footer>
+    Desarrollado por Arielz47
+  </footer>
 </body>
 </html>
